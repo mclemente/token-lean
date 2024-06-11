@@ -1,37 +1,34 @@
 {
-  "title": "Token Lean: Peek Around Corners",
-  "description": "Want to look around corners without moving your token? Stack up on a door and peek around? Just lean!",
-  "authors": [
-    {
-      "name": "WesBelmont",
-      "discord": "wesbelmont",
-      "flags": {}
-    }
-  ],
-  "url": "https://github.com/WesBelmont/token-lean",
-  "flags": {
-    "allowBugReporter": true
-  },
-  "version": "2.1.0",
-  "esmodules": [
-    "script.mjs"
-  ],
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "lang/en.json",
-      "flags": {}
-    }
-  ],
-  "manifest": "https://github.com/WesBelmont/token-lean/releases/latest/download/module.json",
-  "download": "https://github.com/WesBelmont/token-lean/releases/latest/download/module.zip",
-  "bugs": "https://github.com/WesBelmont/token-lean/issues",
-  "changelog": "https://github.com/WesBelmont/token-lean/blob/master/changelog.md",
-  "readme": "https://github.com/WesBelmont/token-lean/blob/master/readme.md",
-  "id": "token-lean",
-  "compatibility": {
-    "minimum": "11",
-    "verified": "11"
-  }
+	"title": "Token Lean: Peek Around Corners",
+	"description": "Want to look around corners without moving your token? Stack up on a door and peek around? Just lean!",
+	"authors": [
+		{
+			"name": "WesBelmont",
+			"discord": "wesbelmont"
+		}
+	],
+	"flags": {
+		"allowBugReporter": true
+	},
+	"esmodules": ["script.mjs"],
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json",
+			"flags": {}
+		}
+	],
+	"bugs": "https://github.com/WesBelmont/token-lean/issues",
+	"changelog": "https://github.com/WesBelmont/token-lean/blob/master/changelog.md",
+	"readme": "https://github.com/WesBelmont/token-lean/blob/master/readme.md",
+	"id": "token-lean",
+	"compatibility": {
+		"minimum": "11",
+		"verified": "12"
+	},
+	"url": "This is auto replaced",
+	"version": "This is auto replaced",
+	"manifest": "This is auto replaced",
+	"download": "This is auto replaced"
 }
