@@ -202,7 +202,6 @@ function updateVisionPosition(token, newPosition = null, reset = false) {
 	const origin = token.getMovementAdjustedPoint(token.center);
 
 	const visionData = token.vision.data;
-	const lightData = token.light.data;
 
 	let x, y;
 
@@ -213,11 +212,16 @@ function updateVisionPosition(token, newPosition = null, reset = false) {
 		x = origin.x;
 		y = origin.y;
 	}
-	visionData.x = lightData.x = x;
-	visionData.y = lightData.y = y;
+	visionData.x = x;
+	visionData.y = y;
 
 	token.vision.initialize(visionData);
-	token.light.initialize(lightData);
+	if (token.light) {
+		const lightData = token.light.data;
+		lightData.x = x;
+		lightData.y = y;
+		token.light.initialize(lightData);
+	}
 
 	canvas.perception.update(
 		{
