@@ -1,37 +1,40 @@
 {
 	"TOKEN-LEAN": {
+		"Keybindings": {
+			"lean": {
+				"Name": "Lean",
+				"Hint": "Press to move your vision towards the mouse cursor."
+			}
+		},
 		"Settings": {
-			"Limit": {
-				"Name": "Maximum lean distance",
-				"Hint": "How many squares a token can lean. Works best between 0.5 and 1.5."
+			"limit": {
+				"Name": "Maximum Lean Distance",
+				"Hint": "How many spaces a token can lean."
 			},
 			"leanWhilePaused": {
-				"Name": "Allow leaning while paused",
-				"Hint": "When enabled, characters can lean while the game is paused."
+				"Name": "Lean While Paused",
+				"Hint": "Players can lean while paused."
 			},
 			"canLeanInCombat": {
-				"Name": "Allow leaning in combat",
-				"Hint": "When enabled, characters can lean during combat encounters. (This can be toggled by the scene control.)"
+				"Name": "Combat Only",
+				"Hint": "Players can only lean during encounters."
 			},
 			"combatLeanToggle": {
-				"Name": "Add combat lean toggle to scene controls",
-				"Hint": "Add a button to the scene controls to toggle leaning in combat."
+				"Name": "Scene Controls Button",
+				"Hint": "Adds a button to the scene controls to toggle the Combat Only setting."
 			},
 			"notifyOnLean": {
-				"Name": "Notify when leaning",
-				"Hint": "Send a whisper to the GM when a character leans."
+				"Name": "Notify When Leaning",
+				"Hint": "Players will send a whisper to the GM when they lean.",
+				"Options": {
+					"1": "Always",
+					"2": "Combat Only",
+					"0": "Never"
+				}
 			},
 			"notifySound": {
-				"Name": "Notification sound",
-				"Hint": "Sound played when a character leans."
-			},
-			"playSound": {
-				"Name": "Play sound with notification",
-				"Hint": "Play a sound when a character leans."
-			},
-			"notifyInCombatOnly": {
-				"Name": "Only notify in combat",
-				"Hint": "Enable notifications only during combat."
+				"Name": "Notification Sound",
+				"Hint": "Play a sound when a notification message is sent. Leave it empty to disable it."
 			}
 		}
 	}

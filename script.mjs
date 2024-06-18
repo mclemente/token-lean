@@ -1,6 +1,8 @@
 let tokenLean;
 
 class TokenLean {
+	graphic = null;
+
 	notified = false;
 
 	token = null;
@@ -21,7 +23,7 @@ class TokenLean {
 
 	lean() {
 		if (this.leaning) {
-			this.notify();
+			if (!game.user.isGM && !this.notified) this.notify();
 			const token = canvas.tokens.get(tokenLean.token);
 			const mousePosition = game.canvas3D?._active
 				? game.canvas3D.interactionManager.canvas2dMousePosition
@@ -52,18 +54,14 @@ class TokenLean {
 	}
 
 	notify() {
-		if (
-			game.settings.get("token-lean", "notifyOnLean") &&
-			!this.notified &&
-			!(game.combat?.started && game.settings.get("token-lean", "notifyInCombatOnly"))
-		) {
+		const notifyOnLean = game.settings.get("token-lean", "notifyOnLean");
+		const notifyOnCombat = game.combat?.started && notifyOnLean === 2;
+		if (notifyOnLean && !notifyOnCombat) {
 			ChatMessage.create({
 				whisper: ChatMessage.getWhisperRecipients("GM"),
 				content: `I'm leaning`,
 				speaker: ChatMessage.getSpeaker(),
-				sound: game.settings.get("token-lean", "playSound")
-					? game.settings.get("token-lean", "notifySound")
-					: null,
+				sound: game.settings.get("token-lean", "notifySound"),
 			});
 			this.notified = true;
 		}
@@ -110,8 +108,8 @@ Hooks.on("i18nInit", () => {
 	});
 
 	game.settings.register("token-lean", "limit", {
-		name: game.i18n.localize("TOKEN-LEAN.Settings.Limit.Name"),
-		hint: game.i18n.localize("TOKEN-LEAN.Settings.Limit.Hint"),
+		name: game.i18n.localize("TOKEN-LEAN.Settings.limit.Name"),
+		hint: game.i18n.localize("TOKEN-LEAN.Settings.limit.Hint"),
 		config: true,
 		type: new foundry.data.fields.NumberField({ required: true, min: 0.5, max: 2, step: 0.25, initial: 0.75 }),
 		scope: "world",
@@ -142,33 +140,21 @@ Hooks.on("i18nInit", () => {
 		type: Boolean,
 		scope: "world",
 		default: true,
+		requiresReload: true,
 	});
 
 	game.settings.register("token-lean", "notifyOnLean", {
 		name: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Name"),
 		hint: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Hint"),
 		config: true,
-		type: Boolean,
+		type: Number,
 		scope: "world",
-		default: true,
-	});
-
-	game.settings.register("token-lean", "notifyInCombatOnly", {
-		name: game.i18n.localize("TOKEN-LEAN.Settings.notifyInCombatOnly.Name"),
-		hint: game.i18n.localize("TOKEN-LEAN.Settings.notifyInCombatOnly.Hint"),
-		config: true,
-		type: Boolean,
-		scope: "world",
-		default: false,
-	});
-
-	game.settings.register("token-lean", "playSound", {
-		name: game.i18n.localize("TOKEN-LEAN.Settings.playSound.Name"),
-		hint: game.i18n.localize("TOKEN-LEAN.Settings.playSound.Hint"),
-		config: true,
-		type: Boolean,
-		scope: "world",
-		default: true,
+		default: 1,
+		choices: {
+			1: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Options.1"),
+			2: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Options.2"),
+			0: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Options.0"),
+		},
 	});
 
 	game.settings.register("token-lean", "notifySound", {
@@ -181,8 +167,8 @@ Hooks.on("i18nInit", () => {
 	});
 
 	game.keybindings.register("token-lean", "lean", {
-		name: "Lean",
-		hint: "Press to move your vision towards the mouse cursor.",
+		name: "TOKEN-LEAN.Keybindings.lean.Name",
+		hint: "TOKEN-LEAN.Keybindings.lean.Hint",
 		editable: [{ key: "KeyQ" }],
 		onDown: () => {
 			const tokenHasVision = canvas.tokens.controlled[0]?.vision?.active === true;
@@ -208,7 +194,6 @@ Hooks.on("setup", () => {
 });
 
 Hooks.on("getSceneControlButtons", (controls) => {
-	//only render for gm
 	if (game.user.isGM && game.settings.get("token-lean", "combatLeanToggle")) {
 		const toggle = {
 			name: "enableCombatLean",
