@@ -43,15 +43,12 @@ class TokenLean {
 			if (!collision) {
 				this.updateVisionPosition(token, collisionRay.B);
 			}
+		} else {
+			const token = canvas.tokens.get(this.token);
+			this.updateVisionPosition(token, token.getMovementAdjustedPoint(token.center), true);
+			this.token = null;
+			this.notified = false;
 		}
-	}
-
-	end() {
-		this.leaning = false;
-		const token = canvas.tokens.get(this.token);
-		this.updateVisionPosition(token, token.getMovementAdjustedPoint(token.center), true);
-		this.token = null;
-		this.notified = false;
 	}
 
 	notify() {
@@ -188,16 +185,19 @@ Hooks.on("i18nInit", () => {
 		hint: "Press to move your vision towards the mouse cursor.",
 		editable: [{ key: "KeyQ" }],
 		onDown: () => {
-			if (TokenLean.canLean()) {
+			const tokenHasVision = canvas.tokens.controlled[0]?.vision?.active === true;
+			const isGM = game.user.isGM;
+			const leanPaused = game.paused && !game.settings.get("token-lean", "leanWhilePaused");
+			const LeanInCombat = game.combat?.started && !game.settings.get("token-lean", "canLeanInCombat");
+			if (tokenHasVision && (isGM || (!leanPaused && !LeanInCombat))) {
 				if (!tokenLean.leaning) tokenLean.token = canvas.tokens.controlled[0].id;
 				tokenLean.leaning = true;
 				tokenLean.lean();
 			}
 		},
 		onUp: () => {
-			if (TokenLean.canLean()) {
-				tokenLean.end();
-			}
+			tokenLean.leaning = false;
+			tokenLean.lean();
 		},
 		repeat: true,
 	});
