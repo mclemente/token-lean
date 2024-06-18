@@ -38,7 +38,7 @@ class TokenLean {
 				Math.hypot(mousePosition.x - token.center.x, mousePosition.y - token.center.y)
 			);
 			const collisionRay = Ray.towardsPoint(origin, mousePosition, collisionRayLimit);
-			//block leaningToken through impassable terrain walls
+			//block leaning token through impassable terrain walls
 			const collision = ClockwiseSweepPolygon.testCollision(collisionRay.A, collisionRay.B, {
 				type: "move",
 				mode: "closest",
@@ -103,12 +103,6 @@ class TokenLean {
 }
 
 Hooks.on("i18nInit", () => {
-	game.settings.register("token-lean", "leaningToken", {
-		config: false,
-		type: String,
-		scope: "client",
-	});
-
 	game.settings.register("token-lean", "limit", {
 		name: game.i18n.localize("TOKEN-LEAN.Settings.limit.Name"),
 		hint: game.i18n.localize("TOKEN-LEAN.Settings.limit.Hint"),
