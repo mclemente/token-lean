@@ -98,13 +98,10 @@ class TokenLean {
 			token.light.initialize(lightData);
 		}
 
-		canvas.perception.update(
-			{
-				refreshVision: true,
-				refreshLighting: true,
-			},
-			true
-		);
+		canvas.perception.update({
+			refreshVision: true,
+			refreshLighting: true,
+		});
 	}
 }
 
