@@ -7,8 +7,16 @@ While holding down the lean button (default q), your token's vision and light so
 Includes options to restrict leaning when paused or in combat.
 The maximum distance you can lean is configurable.
   
-## Planned features
-- adjust token position to follow the lean a small amount and be visible to other players
-- gracefully handle leaning towards walls
+## Caveats
+Sometimes vision isn't blocked properly when leaning towards a wall.
 
-Sound effects obtained from https://www.zapsplat.com
+This is a Core FoundryVTT issue (https://github.com/foundryvtt/foundryvtt/issues/9531)
+
+Blue line: the "vision" ray of the leaning.
+
+Red circle: wall collisions
+
+https://github.com/mclemente/token-lean/assets/5288872/505308f4-cdc0-4b35-ac63-8078545cf800
+
+## Attribution
+- Sound effects obtained from https://www.zapsplat.com
