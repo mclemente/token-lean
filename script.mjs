@@ -25,7 +25,7 @@ class TokenLean {
 			const token = canvas.tokens.get(tokenLean.token);
 			const mousePosition = game.canvas3D?._active
 				? game.canvas3D.interactionManager.canvas2dMousePosition
-				: canvas.app.renderer.events.pointer.getLocalPosition(canvas.app.stage);
+				: canvas.mousePosition;
 			const tokenSize = Math.max(token.document.height, token.document.width);
 			const limit = tokenSize * canvas.grid.size * game.settings.get("token-lean", "limit");
 			const origin = token.getMovementAdjustedPoint(token.center);
@@ -46,18 +46,29 @@ class TokenLean {
 		}
 	}
 
+	end() {
+		this.leaning = false;
+		const token = canvas.tokens.get(this.token);
+		this.updateVisionPosition(token, token.getMovementAdjustedPoint(token.center), true);
+		this.token = null;
+		this.notified = false;
+	}
+
 	notify() {
-		if (game.settings.get("token-lean", "notifyOnLean") && !this.notified) {
-			if (game.combat?.started && game.settings.get("token-lean", "notifyInCombatOnly")) {
-				ChatMessage.create({
-					whisper: ChatMessage.getWhisperRecipients("GM"),
-					content: `I'm leaning`,
-					speaker: ChatMessage.getSpeaker(),
-					sound: game.settings.get("token-lean", "playSound")
-						? game.settings.get("token-lean", "notifySound")
-						: null,
-				});
-			}
+		if (
+			game.settings.get("token-lean", "notifyOnLean") &&
+			!this.notified &&
+			!(game.combat?.started && game.settings.get("token-lean", "notifyInCombatOnly"))
+		) {
+			ChatMessage.create({
+				whisper: ChatMessage.getWhisperRecipients("GM"),
+				content: `I'm leaning`,
+				speaker: ChatMessage.getSpeaker(),
+				sound: game.settings.get("token-lean", "playSound")
+					? game.settings.get("token-lean", "notifySound")
+					: null,
+			});
+			this.notified = true;
 		}
 	}
 
@@ -188,10 +199,7 @@ Hooks.on("i18nInit", () => {
 		},
 		onUp: () => {
 			if (TokenLean.canLean()) {
-				tokenLean.leaning = false;
-				const token = canvas.tokens.get(tokenLean.token);
-				tokenLean.updateVisionPosition(token, token.getMovementAdjustedPoint(token.center), true);
-				tokenLean.token = null;
+				tokenLean.end();
 			}
 		},
 		repeat: true,
