@@ -3,7 +3,11 @@ let tokenLean;
 class TokenLean {
 	graphic = null;
 
+	leaning = false;
+
 	notified = false;
+
+	toggled = false;
 
 	token = null;
 
@@ -18,8 +22,6 @@ class TokenLean {
 		const LeanInCombat = game.combat?.started && !game.settings.get("token-lean", "canLeanInCombat");
 		return tokenHasVision && (isGM || (!leanPaused && !LeanInCombat));
 	}
-
-	static leaning = false;
 
 	lean() {
 		if (this.leaning) {
@@ -166,24 +168,45 @@ Hooks.on("i18nInit", () => {
 		default: "modules/token-lean/audio/leanSound.ogg",
 	});
 
+	const lean = () => {
+		const tokenHasVision = canvas.tokens.controlled[0]?.vision?.active === true;
+		const isGM = game.user.isGM;
+		const leanPaused = game.paused && !game.settings.get("token-lean", "leanWhilePaused");
+		const LeanInCombat = game.combat?.started && !game.settings.get("token-lean", "canLeanInCombat");
+		if (tokenHasVision && (isGM || (!leanPaused && !LeanInCombat))) {
+			if (!tokenLean.leaning) tokenLean.token = canvas.tokens.controlled[0].id;
+			tokenLean.leaning = true;
+			tokenLean.lean();
+		}
+	};
+
 	game.keybindings.register("token-lean", "lean", {
 		name: "TOKEN-LEAN.Keybindings.lean.Name",
 		hint: "TOKEN-LEAN.Keybindings.lean.Hint",
 		editable: [{ key: "KeyQ" }],
-		onDown: () => {
-			const tokenHasVision = canvas.tokens.controlled[0]?.vision?.active === true;
-			const isGM = game.user.isGM;
-			const leanPaused = game.paused && !game.settings.get("token-lean", "leanWhilePaused");
-			const LeanInCombat = game.combat?.started && !game.settings.get("token-lean", "canLeanInCombat");
-			if (tokenHasVision && (isGM || (!leanPaused && !LeanInCombat))) {
-				if (!tokenLean.leaning) tokenLean.token = canvas.tokens.controlled[0].id;
-				tokenLean.leaning = true;
-				tokenLean.lean();
-			}
-		},
+		onDown: () => lean(),
 		onUp: () => {
 			tokenLean.leaning = false;
 			tokenLean.lean();
+		},
+		repeat: true,
+	});
+
+	game.keybindings.register("token-lean", "leanToggle", {
+		name: "TOKEN-LEAN.Keybindings.leanToggle.Name",
+		hint: "TOKEN-LEAN.Keybindings.leanToggle.Hint",
+		editable: [],
+		onDown: () => {
+			if (!tokenLean.toggled) {
+				lean();
+			} else {
+				tokenLean.leaning = false;
+				tokenLean.lean();
+				tokenLean.toggled = false;
+			}
+		},
+		onUp: () => {
+			tokenLean.toggled = true;
 		},
 		repeat: true,
 	});
@@ -211,5 +234,8 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 Hooks.on("controlToken", (token, controlled) => {
-	if (tokenLean.leaning) tokenLean.token = token.id;
+	if (tokenLean.leaning) {
+		tokenLean.token = token.id;
+		tokenLean.toggled = false;
+	}
 });

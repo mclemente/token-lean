@@ -3,7 +3,11 @@
 		"Keybindings": {
 			"lean": {
 				"Name": "Lean",
-				"Hint": "Press to move your vision towards the mouse cursor."
+				"Hint": "Hold to move your vision towards the mouse cursor."
+			},
+			"leanToggle": {
+				"Name": "Lean (Toggle)",
+				"Hint": "Press to move your vision towards the mouse cursor. Press again to reset."
 			}
 		},
 		"Settings": {
