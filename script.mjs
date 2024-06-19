@@ -163,11 +163,7 @@ Hooks.on("i18nInit", () => {
 	});
 
 	const lean = () => {
-		const tokenHasVision = canvas.tokens.controlled[0]?.vision?.active === true;
-		const isGM = game.user.isGM;
-		const leanPaused = game.paused && !game.settings.get("token-lean", "leanWhilePaused");
-		const LeanInCombat = game.combat?.started && !game.settings.get("token-lean", "canLeanInCombat");
-		if (tokenHasVision && (isGM || (!leanPaused && !LeanInCombat))) {
+		if (TokenLean.canLean()) {
 			if (!tokenLean.leaning) tokenLean.token = canvas.tokens.controlled[0].id;
 			tokenLean.leaning = true;
 			tokenLean.lean();
@@ -200,7 +196,7 @@ Hooks.on("i18nInit", () => {
 			}
 		},
 		onUp: () => {
-			tokenLean.toggled = true;
+			if (tokenLean.leaning) tokenLean.toggled = true;
 		},
 		repeat: true,
 	});
