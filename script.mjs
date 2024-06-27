@@ -49,7 +49,7 @@ class TokenLean {
 			}
 		} else {
 			const token = canvas.tokens.get(this.token);
-			this.updateVisionPosition(token, token.getMovementAdjustedPoint(token.center), true);
+			if (token) this.updateVisionPosition(token, token.getMovementAdjustedPoint(token.center), true);
 			this.token = null;
 			this.notified = false;
 		}
@@ -225,7 +225,8 @@ Hooks.on("getSceneControlButtons", (controls) => {
 
 Hooks.on("controlToken", (token, controlled) => {
 	if (tokenLean.leaning) {
-		tokenLean.token = token.id;
+		if (token.id !== tokenLean.token) tokenLean.token = token.id;
+		else if (!controlled) tokenLean.token = null;
 		tokenLean.toggled = false;
 	}
 });
