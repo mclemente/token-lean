@@ -41,7 +41,7 @@ class TokenLean {
 			//block leaning token through impassable terrain walls
 			const collision = ClockwiseSweepPolygon.testCollision(collisionRay.A, collisionRay.B, {
 				type: "move",
-				mode: "closest",
+				mode: "closest"
 			});
 
 			if (!collision) {
@@ -63,7 +63,7 @@ class TokenLean {
 				whisper: ChatMessage.getWhisperRecipients("GM"),
 				content: `I'm leaning`,
 				speaker: ChatMessage.getSpeaker(),
-				sound: game.settings.get("token-lean", "notifySound"),
+				sound: game.settings.get("token-lean", "notifySound")
 			});
 			this.notified = true;
 		}
@@ -97,7 +97,7 @@ class TokenLean {
 
 		canvas.perception.update({
 			refreshVision: true,
-			refreshLighting: true,
+			refreshLighting: true
 		});
 	}
 }
@@ -108,7 +108,7 @@ Hooks.on("i18nInit", () => {
 		hint: game.i18n.localize("TOKEN-LEAN.Settings.limit.Hint"),
 		config: true,
 		type: new foundry.data.fields.NumberField({ required: true, min: 0.5, max: 2, step: 0.25, initial: 0.75 }),
-		scope: "world",
+		scope: "world"
 	});
 
 	game.settings.register("token-lean", "leanWhilePaused", {
@@ -117,7 +117,7 @@ Hooks.on("i18nInit", () => {
 		config: true,
 		type: Boolean,
 		scope: "world",
-		default: false,
+		default: false
 	});
 
 	game.settings.register("token-lean", "canLeanInCombat", {
@@ -126,7 +126,7 @@ Hooks.on("i18nInit", () => {
 		config: true,
 		type: Boolean,
 		scope: "world",
-		default: true,
+		default: true
 	});
 
 	game.settings.register("token-lean", "combatLeanToggle", {
@@ -136,7 +136,7 @@ Hooks.on("i18nInit", () => {
 		type: Boolean,
 		scope: "world",
 		default: true,
-		requiresReload: true,
+		requiresReload: true
 	});
 
 	game.settings.register("token-lean", "notifyOnLean", {
@@ -149,8 +149,8 @@ Hooks.on("i18nInit", () => {
 		choices: {
 			1: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Options.1"),
 			2: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Options.2"),
-			0: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Options.0"),
-		},
+			0: game.i18n.localize("TOKEN-LEAN.Settings.notifyOnLean.Options.0")
+		}
 	});
 
 	game.settings.register("token-lean", "notifySound", {
@@ -159,7 +159,7 @@ Hooks.on("i18nInit", () => {
 		config: true,
 		filePicker: "audio",
 		scope: "world",
-		default: "modules/token-lean/audio/leanSound.ogg",
+		default: "modules/token-lean/audio/leanSound.ogg"
 	});
 
 	const lean = () => {
@@ -179,7 +179,7 @@ Hooks.on("i18nInit", () => {
 			tokenLean.leaning = false;
 			tokenLean.lean();
 		},
-		repeat: true,
+		repeat: true
 	});
 
 	game.keybindings.register("token-lean", "leanToggle", {
@@ -198,7 +198,7 @@ Hooks.on("i18nInit", () => {
 		onUp: () => {
 			if (tokenLean.leaning) tokenLean.toggled = true;
 		},
-		repeat: true,
+		repeat: true
 	});
 });
 
@@ -217,7 +217,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			onClick: (toggle) => {
 				let newState = !game.settings.get("token-lean", "canLeanInCombat");
 				game.settings.set("token-lean", "canLeanInCombat", newState);
-			},
+			}
 		};
 		controls.find((c) => c.name == "token").tools.push(toggle);
 	}
