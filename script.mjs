@@ -40,7 +40,7 @@ class TokenLean {
 			const collisionRay = Ray.towardsPoint(origin, mousePosition, collisionRayLimit);
 			//block leaning token through impassable terrain walls
 			const collision = ClockwiseSweepPolygon.testCollision(collisionRay.A, collisionRay.B, {
-				type: "move",
+				type: "sight",
 				mode: "closest"
 			});
 
@@ -173,7 +173,7 @@ Hooks.on("i18nInit", () => {
 	game.keybindings.register("token-lean", "lean", {
 		name: "TOKEN-LEAN.Keybindings.lean.Name",
 		hint: "TOKEN-LEAN.Keybindings.lean.Hint",
-		editable: [{ key: "KeyQ" }],
+		editable: [{ key: "KeyP" }],
 		onDown: () => lean(),
 		onUp: () => {
 			tokenLean.leaning = false;
@@ -209,7 +209,7 @@ Hooks.on("setup", () => {
 Hooks.on("getSceneControlButtons", (controls) => {
 	if (game.user.isGM && game.settings.get("token-lean", "combatLeanToggle")) {
 		const toggle = {
-			name: "enableCombatLean",
+			name: "tokenLean",
 			title: game.i18n.localize("TOKEN-LEAN.Settings.canLeanInCombat.Name"),
 			icon: "fas fa-face-hand-peeking",
 			toggle: true,
@@ -219,7 +219,8 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				game.settings.set("token-lean", "canLeanInCombat", newState);
 			}
 		};
-		controls.find((c) => c.name == "token").tools.push(toggle);
+		if (game.release.generation <= 12) controls.find((c) => c.name == "token").tools.push(toggle);
+		else controls.tokens.tools.tokenLean = toggle;
 	}
 });
 
