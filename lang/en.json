@@ -20,7 +20,7 @@
 				"Hint": "Players can lean while paused."
 			},
 			"canLeanInCombat": {
-				"Name": "Combat Only",
+				"Name": "Token Lean: Combat Only",
 				"Hint": "Players can only lean during encounters."
 			},
 			"combatLeanToggle": {
@@ -35,6 +35,11 @@
 					"2": "Combat Only",
 					"0": "Never"
 				}
+			},
+			"notifyMessage": {
+				"Name": "Notification Message",
+				"Hint": "The whisper's content.",
+				"Default": "I'm leaning."
 			},
 			"notifySound": {
 				"Name": "Notification Sound",
