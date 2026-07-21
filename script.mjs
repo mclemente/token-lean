@@ -24,35 +24,37 @@ class TokenLean {
 	}
 
 	lean() {
-		if (this.leaning) {
-			if (!game.user.isGM && !this.notified) this.notify();
-			const token = canvas.tokens.get(tokenLean.token);
-			const mousePosition = game.canvas3D?._active
-				? game.canvas3D.interactionManager.canvas2dMousePosition
-				: canvas.mousePosition;
-			const tokenSize = Math.max(token.document.height, token.document.width);
-			const limit = tokenSize * canvas.grid.size * game.settings.get("token-lean", "limit");
-			const origin = token.getMovementAdjustedPoint(token.center);
-			const collisionRayLimit = Math.min(
-				limit,
-				Math.hypot(mousePosition.x - token.center.x, mousePosition.y - token.center.y)
-			);
-			const collisionRay = Ray.towardsPoint(origin, mousePosition, collisionRayLimit);
-			//block leaning token through impassable terrain walls
-			const collision = ClockwiseSweepPolygon.testCollision(collisionRay.A, collisionRay.B, {
-				type: "sight",
-				mode: "closest"
-			});
+		if (!game.user.isGM && !this.notified) this.notify();
+		const token = canvas.tokens.get(this.token.id);
+		const mousePosition = game.canvas3D?._active
+			? game.canvas3D.interactionManager.canvas2dMousePosition
+			: canvas.mousePosition;
+		const tokenSize = Math.max(token.document.height, token.document.width);
+		const limit = tokenSize * canvas.grid.size * game.settings.get("token-lean", "limit");
+		const origin = token.getMovementAdjustedPoint(this.token.center);
+		const collisionRayLimit = Math.min(
+			limit,
+			Math.hypot(mousePosition.x - this.token.center.x, mousePosition.y - this.token.center.y)
+		);
+		const collisionRay = Ray.towardsPoint(origin, mousePosition, collisionRayLimit);
+		//block leaning token through impassable terrain walls
+		const collision = ClockwiseSweepPolygon.testCollision(collisionRay.A, collisionRay.B, {
+			type: "sight",
+			mode: "closest"
+		});
 
-			if (!collision) {
-				this.updateVisionPosition(token, collisionRay.B);
-			}
-		} else {
-			const token = canvas.tokens.get(this.token);
-			if (token) this.updateVisionPosition(token, token.getMovementAdjustedPoint(token.center), true);
-			this.token = null;
-			this.notified = false;
+		if (!collision) {
+			this.updateVisionPosition(token, collisionRay.B);
 		}
+	}
+
+	unlean() {
+		const token = canvas.tokens.get(this.token?.id);
+		if (token) this.updateVisionPosition(token);
+		this.token = null;
+		this.leaning = false;
+		this.notified = false;
+		this.toggled = false;
 	}
 
 	notify() {
@@ -61,7 +63,7 @@ class TokenLean {
 		if (notifyOnLean && !notifyOnCombat) {
 			ChatMessage.create({
 				whisper: ChatMessage.getWhisperRecipients("GM"),
-				content: `I'm leaning`,
+				content: game.settings.get("token-lean", "notifyMessage"),
 				speaker: ChatMessage.getSpeaker(),
 				sound: game.settings.get("token-lean", "notifySound")
 			});
@@ -69,25 +71,28 @@ class TokenLean {
 		}
 	}
 
-	updateVisionPosition(token, newPosition = null, reset = false) {
+	updateVisionPosition(token, newPosition) {
 		const isVisionSource = token._isVisionSource();
-		const origin = token.getMovementAdjustedPoint(token.center);
 
-		const visionData = token.vision.data;
+		const visionData = token.vision?.data;
 
 		let x, y;
 
-		if (isVisionSource && !reset) {
+		if (isVisionSource && newPosition) {
 			x = newPosition.x;
 			y = newPosition.y;
 		} else {
-			x = origin.x;
-			y = origin.y;
+			const { center } = this.token;
+			x = center.x;
+			y = center.y;
 		}
-		visionData.x = x;
-		visionData.y = y;
+		if (visionData) {
+			visionData.x = x;
+			visionData.y = y;
 
-		token.vision.initialize(visionData);
+			token.vision.initialize(visionData);
+		}
+
 		if (token.light) {
 			const lightData = token.light.data;
 			lightData.x = x;
@@ -153,6 +158,15 @@ Hooks.on("i18nInit", () => {
 		}
 	});
 
+	game.settings.register("token-lean", "notifyMessage", {
+		name: game.i18n.localize("TOKEN-LEAN.Settings.notifyMessage.Name"),
+		hint: game.i18n.localize("TOKEN-LEAN.Settings.notifyMessage.Hint"),
+		config: true,
+		type: String,
+		scope: "world",
+		default: game.i18n.localize("TOKEN-LEAN.Settings.notifyMessage.Default"),
+	});
+
 	game.settings.register("token-lean", "notifySound", {
 		name: game.i18n.localize("TOKEN-LEAN.Settings.notifySound.Name"),
 		hint: game.i18n.localize("TOKEN-LEAN.Settings.notifySound.Hint"),
@@ -164,7 +178,9 @@ Hooks.on("i18nInit", () => {
 
 	const lean = () => {
 		if (TokenLean.canLean()) {
-			if (!tokenLean.leaning) tokenLean.token = canvas.tokens.controlled[0].id;
+			const token = canvas.tokens.controlled[0];
+			const { center, id, x, y } = token;
+			if (!tokenLean.leaning) tokenLean.token = { center, id, x, y };
 			tokenLean.leaning = true;
 			tokenLean.lean();
 		}
@@ -176,8 +192,8 @@ Hooks.on("i18nInit", () => {
 		editable: [{ key: "KeyP" }],
 		onDown: () => lean(),
 		onUp: () => {
-			tokenLean.leaning = false;
-			tokenLean.lean();
+			if (!TokenLean.canLean()) return true;
+			tokenLean.unlean();
 		},
 		repeat: true
 	});
@@ -190,15 +206,12 @@ Hooks.on("i18nInit", () => {
 			if (!tokenLean.toggled) {
 				lean();
 			} else {
-				tokenLean.leaning = false;
-				tokenLean.lean();
-				tokenLean.toggled = false;
+				tokenLean.unlean();
 			}
 		},
 		onUp: () => {
 			if (tokenLean.leaning) tokenLean.toggled = true;
-		},
-		repeat: true
+		}
 	});
 });
 
@@ -225,9 +238,5 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 Hooks.on("controlToken", (token, controlled) => {
-	if (tokenLean.leaning) {
-		if (token.id !== tokenLean.token) tokenLean.token = token.id;
-		else if (!controlled) tokenLean.token = null;
-		tokenLean.toggled = false;
-	}
+	if (tokenLean.leaning && !controlled) tokenLean.unlean();
 });

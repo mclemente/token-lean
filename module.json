@@ -24,8 +24,8 @@
 	"readme": "https://github.com/WesBelmont/token-lean/blob/master/readme.md",
 	"id": "token-lean",
 	"compatibility": {
-		"minimum": "12",
-		"verified": "13"
+		"minimum": "14",
+		"verified": "14"
 	},
 	"url": "This is auto replaced",
 	"version": "This is auto replaced",
