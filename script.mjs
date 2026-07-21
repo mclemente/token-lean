@@ -81,6 +81,8 @@ class TokenLean {
 		if (isVisionSource && newPosition) {
 			x = newPosition.x;
 			y = newPosition.y;
+			token.border.visible = false;
+			token.effects.visible = false;
 		} else {
 			const { center } = this.token;
 			x = center.x;
