@@ -44,7 +44,7 @@ class TokenLean {
 		});
 
 		if (!collision) {
-			Hooks.callAll('tokenLeanUpdate', true, token, collisionRay.B);
+			Hooks.callAll("tokenLeanUpdate", token, { leaning: true, collisionRay });
 			this.updateVisionPosition(token, collisionRay.B);
 		}
 	}
@@ -52,7 +52,7 @@ class TokenLean {
 	unlean() {
 		const token = canvas.tokens.get(this.token?.id);
 		if (token) this.updateVisionPosition(token);
-		Hooks.callAll('tokenLeanUpdate', false, token, null);
+		Hooks.callAll("tokenLeanUpdate", token, { leaning: false });
 		this.token = null;
 		this.leaning = false;
 		this.notified = false;
